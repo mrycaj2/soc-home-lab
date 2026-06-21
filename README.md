@@ -12,8 +12,17 @@
 
 ## Zapytanie SPL - detekcja brute-force
 ```splunk
-index=main sourcetype="linux_secure" "Failed password"
-| rex "from (?P<src_ip>\d+\.\d+\.\d+\.\d+)"
-| stats count as attempts by src_ip
-| where attempts > 5
-| eval risk="HIGH"
+index=main sourcetype="linux_secure" ("Failed password" OR "Invalid user")
+| rex "for (?:invalid user )?(?P<user>\S+) from (?P<src_ip>\d+\.\d+\.\d+\.\d+)"
+| stats count as attempts by src_ip, user
+| sort -attempts
+| eval risk=if(attempts>3,"HIGH","LOW")
+```
+## Zapytanie SPL - detekcja blokad Pi-Hole
+```splunk
+index=main sourcetype="pihole.log" "blocked"
+| rex "blocked (?P<domain>[^\s]+)"
+| stats count as blocked_count by domain
+| sort -blocked_count
+| head 10
+```
