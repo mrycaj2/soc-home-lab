@@ -32,5 +32,7 @@ index=main sourcetype="pihole.log" "blocked"
 Splunk, SPL, Docker, Linux, SSH, Pi-hole, auth.log, DNS logs
 
 ## Screenshots
+### SSH Brute-Force Detection
 ![SSH Brute-Force Detection](screenshots/splunk_ssh_bruteforce_detection.png)
+### DNS Blocked Domains
 ![DNS Blocked Domains](screenshots/splunk_dns_blocked_domains.png)
