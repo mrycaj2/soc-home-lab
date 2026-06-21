@@ -2,7 +2,7 @@
 
 ## Środowisko
 - Splunk Free (Docker) na serwerze Ubuntu 26.04
-- Hardware: Lenovo YOGA, 7 GB RAM
+- Hardware: Lenovo YOGA, 8 GB RAM
 
 ## Co zrobiłem
 - Skonfigurowałem Splunk w Dockerze i zaindeksowałem auth.log z systemu Linux
