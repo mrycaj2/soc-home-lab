@@ -1,17 +1,17 @@
 # SOC Home Lab – Splunk SIEM
 
-## Środowisko
-Splunk Free w Dockerze na dedykowanym serwerze Ubuntu 26.04 (Lenovo YOGA, 8 GB RAM).
+## Environment
+Splunk Free running in Docker on a dedicated Ubuntu 26.04 server (Lenovo YOGA, 8 GB RAM).
 
-## Co zrobiłem
+## What I built
 
-Zaindeksowałem dwa źródła logów: auth.log z systemu Linux i logi DNS z Pi-hole.
+Ingested two log sources into Splunk: Linux auth.log and DNS logs from Pi-hole.
 
-Na auth.log napisałem zapytanie SPL wykrywające nieudane logowania SSH. Grupuję próby po IP źródłowym i użytkowniku, klasyfikuję ryzyko jako HIGH jeśli z jednego IP przyszło więcej niż 3 próby. Skonfigurowałem alert który odpala się automatycznie gdy IP przekroczy próg 5 prób.
+On auth.log I wrote an SPL query to detect failed SSH logins. It groups attempts by source IP and username and classifies risk as HIGH when a single IP exceeds 3 failed attempts. Configured an alert that fires automatically when the threshold of 5 attempts is crossed.
 
-Na logach Pi-hole analizuję ruch DNS w sieci. Wyciągam zablokowane domeny, sortuję po liczbie prób połączenia. W trakcie analizy wykryłem urządzenie w sieci regularnie odpytujące domenę figurującą na blocklist Pi-hole – prześledziłem źródło do konkretnego IP.
+On Pi-hole DNS logs I analyze network DNS traffic. I extract blocked domains and sort by attempt count. During analysis I detected a device on the network repeatedly querying a domain on Pi-hole's blocklist and traced it back to a specific IP address.
 
-## Zapytanie SPL – detekcja brute-force SSH
+## SPL – SSH Brute-Force Detection
 ```splunk
 index=main sourcetype="linux_secure" ("Failed password" OR "Invalid user")
 | rex "for (?:invalid user )?(?P<user>\S+) from (?P<src_ip>\d+\.\d+\.\d+\.\d+)"
@@ -19,7 +19,8 @@ index=main sourcetype="linux_secure" ("Failed password" OR "Invalid user")
 | sort -attempts
 | eval risk=if(attempts>3,"HIGH","LOW")
 ```
-## Zapytanie SPL – analiza DNS Pi-hole
+
+## SPL – Pi-hole DNS Analysis
 ```splunk
 index=main sourcetype="pihole.log" "blocked"
 | rex "blocked (?P<domain>[^\s]+)"
@@ -28,8 +29,8 @@ index=main sourcetype="pihole.log" "blocked"
 | head 10
 ```
 
-## Technologie
-Splunk, SPL, Docker, Linux, SSH, Pi-hole, auth.log, DNS logs
+## Stack
+Splunk · SPL · Docker · Linux · SSH · Pi-hole · auth.log · DNS logs
 
 ## Screenshots
 ### SSH Brute-Force Detection
